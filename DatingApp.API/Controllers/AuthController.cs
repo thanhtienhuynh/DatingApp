@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Dtos;
 using DatingApp.API.Models;
@@ -18,9 +19,11 @@ namespace DatingApp.API.Controllers
     {
         private readonly IAuthRepository repo;
         private readonly IConfiguration config;
+        private readonly IMapper mapper;
 
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
+            this.mapper = mapper;
             this.config = config;
             this.repo = repo;
 
@@ -36,20 +39,19 @@ namespace DatingApp.API.Controllers
                 return BadRequest("Username already exists");
             }
 
-            var userToCreate = new User
-            {
-                Username = dto.Username
-            };
+            var userToCreate = mapper.Map<User>(dto);
 
             var createUser = await repo.Register(userToCreate, dto.Password);
 
-            return StatusCode(201);
+            var userToReturn = mapper.Map<UserForDetailDto>(createUser);
+
+            return CreatedAtRoute("GetUser", new {controller = "Users", id = createUser.Id}, userToReturn);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto dto)
-        {   
-            
+        {
+
             var userFromRepo = await repo.Login(dto.Username.ToLower(), dto.Password);
 
             if (userFromRepo == null)
@@ -78,13 +80,13 @@ namespace DatingApp.API.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new {
-                token = tokenHandler.WriteToken(token)
-            });
-                 
-            
-            
+            var user = mapper.Map<UserForListDto>(userFromRepo);
 
+            return Ok(new
+            {
+                token = tokenHandler.WriteToken(token),
+                user
+            });
         }
 
     }

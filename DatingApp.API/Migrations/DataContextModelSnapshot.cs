@@ -14,7 +14,7 @@ namespace DatingApp.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085");
+                .HasAnnotation("ProductVersion", "2.1.14-servicing-32113");
 
             modelBuilder.Entity("DatingApp.API.Models.Photo", b =>
                 {
@@ -26,6 +26,8 @@ namespace DatingApp.API.Migrations
                     b.Property<string>("Description");
 
                     b.Property<bool>("IsMain");
+
+                    b.Property<string>("PublicId");
 
                     b.Property<int>("UserId");
 

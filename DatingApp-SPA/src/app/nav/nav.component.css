@@ -2,7 +2,8 @@
     cursor: pointer;
 }
 
-/* .nav{
-    padding-left: 50px;
-    padding-right: 50px;
-} */
+img {
+    max-height: 50px;
+    border: 2px solid white;
+    display: inline;
+}
